@@ -169,9 +169,11 @@ function cat_music_options_page() {
 									echo ')</label>
 							</th>
 							<td>
-								<input type="file" name="song" id="song">	        		
+								<input type="file" name="song" id="song" />
 								<br>
-								请选择MP3或者ogg文件
+								<input type="text" class="regular-text" name="songURL" placeholder="请填写音乐文件地址，带http://" value="'.$singleSongInfoArr['path'].'" />		
+								<br>
+								请从本地选择MP3文件或者填写音乐文件的URL
 							</td>
 						</tr>
 						<tr>
@@ -179,9 +181,11 @@ function cat_music_options_page() {
 								<label for="lrc">歌词文件(选填)</label>
 							</th>
 							<td>
-								<input type="file" name="lrc" id="lrc">	        		
+								<input type="file" name="lrc" id="lrc" />	        		
 								<br>
-								请选择lrc文件
+								<input type="text" class="regular-text" name="lrcURL" placeholder="请填写歌词文件地址，带http://" value="'.$singleSongInfoArr['lrc'].'" />		
+								<br>
+								请选择lrc文件或者填写歌词文件的URL
 							</td>
 						</tr>
 						<tr>
@@ -195,9 +199,11 @@ function cat_music_options_page() {
 									echo ')</label>
 							</th>
 							<td>
-								<input type="file" name="cover" id="cover">	        		
+								<input type="file" name="cover" id="cover" />	        		
 								<br>
-								请选择jpg|png|gif格式的图片文件
+								<input type="text" class="regular-text" name="coverURL" placeholder="请填写封面图片地址，带http://" value="'.$singleSongInfoArr['cover'].'" />		
+								<br>
+								请选择jpg|png|gif格式的图片文件或者填写图片URL
 							</td>
 						</tr>
 						<tr>
@@ -211,7 +217,7 @@ function cat_music_options_page() {
 									echo ')</label>
 							</th>
 							<td>
-								<input type="text" class="regular-text" value="'.$singleSongInfoArr['title'].'" name="songName" id="songName">	        		
+								<input type="text" class="regular-text" value="'.$singleSongInfoArr['title'].'" name="songName" id="songName" />
 								<br>	        		
 								请填写歌曲名字
 							</td>
@@ -221,7 +227,7 @@ function cat_music_options_page() {
 								<label for="songArtist">作词作曲(选填)</label>
 							</th>
 							<td>
-								<input type="text" class="regular-text" value="'.$singleSongInfoArr['artist'].'" name="songArtist" id="songArtist">	        		
+								<input type="text" class="regular-text" value="'.$singleSongInfoArr['artist'].'" name="songArtist" id="songArtist" />
 								<br>	        		
 								请填写作词作曲人
 							</td>
@@ -231,7 +237,7 @@ function cat_music_options_page() {
 								<label for="songAlbum">专辑名称(选填)</label>
 							</th>
 							<td>
-								<input type="text" class="regular-text" value="'.$singleSongInfoArr['album'].'" name="songAlbum" id="songAlbum">	        		
+								<input type="text" class="regular-text" value="'.$singleSongInfoArr['album'].'" name="songAlbum" id="songAlbum" />
 								<br>	        		
 								请填写专辑名称
 							</td>
@@ -241,7 +247,7 @@ function cat_music_options_page() {
 								<label for="songYear">发行年月(选填)</label>
 							</th>
 							<td>
-								<input type="text" class="regular-text" value="'.$singleSongInfoArr['year'].'" name="songYear" id="songYear">	        		
+								<input type="text" class="regular-text" value="'.$singleSongInfoArr['year'].'" name="songYear" id="songYear" />
 								<br>	        		
 								请填写发行年月
 							</td>
@@ -257,7 +263,7 @@ function cat_music_options_page() {
 									echo ')</label>
 							</th>
 							<td>
-								<input type="text" class="regular-text" value="'.$singleSongInfoArr['singer'].'" name="songSinger" id="songSinger">	        		
+								<input type="text" class="regular-text" value="'.$singleSongInfoArr['singer'].'" name="songSinger" id="songSinger" />
 								<br>	        		
 								请填写歌手姓名
 							</td>
@@ -273,7 +279,7 @@ function cat_music_options_page() {
 									echo ')</label>
 							</th>
 							<td>
-								<input type="text" class="regular-text" value="'.$singleSongInfoArr['length'].'" name="songLength" id="songLength">	        		
+								<input type="text" class="regular-text" value="'.$singleSongInfoArr['length'].'" name="songLength" id="songLength" />
 								<br>	        		
 								请填写歌曲长度，例子：03:00
 							</td>
@@ -281,7 +287,7 @@ function cat_music_options_page() {
 					</tbody>
 				</table>
 				<p class="submit">
-					<input id="submit" class="button button-primary" type="submit" value="保存更改" name="submit">
+					<input id="submit" class="button button-primary" type="submit" value="保存更改" name="submit" />
 				</p>
 			</form>
 		';
@@ -386,7 +392,7 @@ function add_song($isEdit = "0") {
 	$maxObj = $wpdb->get_row("SELECT * FROM ".$wpdb->prefix."music ORDER BY `id` DESC LIMIT 1");
 	$max = obj2arr($maxObj);
 	if ($isEdit == "0") {
-		if ($_POST['songName'] && $_POST['songSinger'] && $_POST['songLength'] && $_FILES['song']['tmp_name'] && $_FILES['cover']['tmp_name']) {
+		if ($_POST['songName'] && $_POST['songSinger'] && $_POST['songLength'] && ($_FILES['song']['tmp_name'] || $_POST['songURL']) && ($_FILES['cover']['tmp_name'] || $_POST['coverURL'])) {
 			$max = $max['id'] + 1;
 	    		$songName = addslashes($_POST['songName']);
 	    		$songArtist = $_POST['songArtist']?addslashes($_POST['songArtist']):"";
@@ -394,13 +400,23 @@ function add_song($isEdit = "0") {
 	    		$songYear = $_POST['songYear']?addslashes($_POST['songYear']):"";
 	    		$songSinger = addslashes($_POST['songSinger']);
 	    		$songLength = addslashes($_POST['songLength']);
-	    		$song = $_FILES['song']['tmp_name'];
-	    		$cover = $_FILES['cover']['tmp_name'];
-	    		$songPath = upload($_FILES['song']['name'], $song, array("mp3"), $max);
-	    		$coverPath = upload($_FILES['cover']['name'], $cover, array("jpg", "png", "gif"), $max);
+	    		if ($_POST['songURL']) {
+	    			$songPath = addslashes($_POST['songURL']);
+	    		}else{
+	    			$song = $_FILES['song']['tmp_name'];
+	    			$songPath = upload($_FILES['song']['name'], $song, array("mp3"), $max);
+	    		}
+	    		if ($_POST['coverURL']) {
+	    			$coverPath = addslashes($_POST['coverURL']);
+	    		}else{
+	    			$cover = $_FILES['cover']['tmp_name'];
+	    			$coverPath = upload($_FILES['cover']['name'], $cover, array("jpg", "png", "gif"), $max);
+	    		}
 	    		if ($_FILES['lrc']['tmp_name']) {
 	    			$lrc = $_FILES['lrc']['tmp_name'];
 	    			$lrcPath = upload($_FILES['lrc']['name'], $lrc, array("lrc"), $max);
+	    		}elseif(!$_FILES['lrc']['tmp_name'] && $_POST['lrcURL']) {
+	    			$lrcPath = addslashes($_POST['lrcURL']);
 	    		}else{
 	    			$lrcPath = "";
 	    		}
@@ -419,18 +435,24 @@ function add_song($isEdit = "0") {
 			if ($_FILES['song']['tmp_name']) {
 				$song = $_FILES['song']['tmp_name'];
 				$songPath = upload($_FILES['song']['name'], $song, array("mp3"), $dataId);
+			}elseif(!$_FILES['song']['tmp_name'] && $_POST['songURL']) {
+				$songPath = addslashes($_POST['songURL']);
 			}else{
 				$songPath = "";
 			}
 			if ($_FILES['cover']['tmp_name']) {
 				$cover = $_FILES['cover']['tmp_name'];
 				$coverPath = upload($_FILES['cover']['name'], $cover, array("jpg", "png", "gif"), $dataId);
+			}elseif(!$_FILES['cover']['tmp_name'] && $_POST['coverURL']) {
+				$coverPath = addslashes($_POST['coverURL']);
 			}else{
 				$coverPath = "";
 			}
 			if ($_FILES['lrc']['tmp_name']) {
 				$lrc = $_FILES['lrc']['tmp_name'];
 				$lrcPath = upload($_FILES['lrc']['name'], $lrc, array("lrc"), $dataId);
+			}elseif(!$_FILES['lrc']['tmp_name'] && $_POST['lrcURL']) {
+				$lrcPath = addslashes($_POST['lrcURL']);
 			}else{
 				$lrcPath = "";
 			}
